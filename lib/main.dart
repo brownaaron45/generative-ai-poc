@@ -98,24 +98,51 @@ class PdfUploadWidgetState extends State<PdfUploadWidget> {
         const SizedBox(height: 16),
         if (_fileBytes != null)
           Expanded(
-            child: PdfDocumentLoader.openData(
-              _fileBytes!,
-              documentBuilder: (context, pdfDocument, pageCount) =>
-                  LayoutBuilder(
-                builder: (context, constraints) => ListView.builder(
-                  itemCount: pageCount,
-                  itemBuilder: (context, index) => Container(
-                    margin: EdgeInsets.all(margin),
-                    padding: EdgeInsets.all(padding),
-                    color: Colors.black12,
-                    child: PdfPageView(
-                      pdfDocument: pdfDocument,
-                      pageNumber: index + 1,
+            child: Row(children: [
+              SizedBox(
+                width: 600,
+                child: PdfDocumentLoader.openData(
+                  _fileBytes!,
+                  documentBuilder: (context, pdfDocument, pageCount) =>
+                      LayoutBuilder(
+                    builder: (context, constraints) => ListView.builder(
+                      itemCount: pageCount,
+                      itemBuilder: (context, index) => Container(
+                        margin: EdgeInsets.all(margin),
+                        padding: EdgeInsets.all(padding),
+                        color: Colors.black12,
+                        child: PdfPageView(
+                          pdfDocument: pdfDocument,
+                          pageNumber: index + 1,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
+              const Spacer(),
+              SizedBox(
+                width: 600,
+                child: PdfDocumentLoader.openData(
+                  _fileBytes!,
+                  documentBuilder: (context, pdfDocument, pageCount) =>
+                      LayoutBuilder(
+                    builder: (context, constraints) => ListView.builder(
+                      itemCount: pageCount,
+                      itemBuilder: (context, index) => Container(
+                        margin: EdgeInsets.all(margin),
+                        padding: EdgeInsets.all(padding),
+                        color: Colors.black12,
+                        child: PdfPageView(
+                          pdfDocument: pdfDocument,
+                          pageNumber: index + 1,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ]),
           )
         else
           const Text('No file selected.'),
