@@ -1,0 +1,26 @@
+{
+  "name": "generative-ai-poc",
+  "version": "0.1.0+1",
+  "description": "Your project description",
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "tsc -p ./tsconfig.json",
+    "build:watch": "tsc -p ./tsconfig.json --watch",
+    "start": "node src/index.ts"
+  },
+  "keywords": [],
+  "author": "Aaron Brown",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.32.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "typescript": "^4.5.4"
+  }
+}
