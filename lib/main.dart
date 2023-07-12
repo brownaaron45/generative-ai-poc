@@ -90,6 +90,7 @@ class PdfUploadWidgetState extends State<PdfUploadWidget> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const SizedBox(height: 16),
         ElevatedButton(
           onPressed: _openFileExplorer,
           child: const Text('Select PDF'),
