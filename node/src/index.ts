@@ -1,4 +1,4 @@
-import express, {Request, Response} from "express";
+import express from "express";
 
 const app = express();
 const port = 3000;
@@ -7,7 +7,7 @@ const port = 3000;
 app.use(express.json());
 
 // Routes
-app.get("/", (req: Request, res: Response) => {
+app.get("/", (req: express.Request, res: express.Response) => {
   res.send("Hello, World!");
 });
 
