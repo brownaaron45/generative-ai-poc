@@ -70,8 +70,8 @@ class PdfUploadWidget extends StatefulWidget {
 
 class PdfUploadWidgetState extends State<PdfUploadWidget> {
   Uint8List? _fileBytes;
-  double margin = 10;
-  double padding = 10;
+  double margin = 0;
+  double padding = 16;
 
   Future<void> _openFileExplorer() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
