@@ -1,7 +1,5 @@
 // src/pdf_converter.ts
-// eslint-disable-next-line spaced-comment
-/// <reference path="../typings/pdf2json-types.d.ts" />
-import {Output} from "pdf2json-types";
+import {Output} from "./third-party-types/pdf2json-types";
 
 /**
  * Extracts text from a PDF file stored in memory as a buffer.

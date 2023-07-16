@@ -19,7 +19,6 @@ module.exports = {
   },
   ignorePatterns: [
     "/lib/**/*", // Ignore built files.
-    "/typings/pdf2json-types.d.ts", // ignore pdf2json file
   ],
   plugins: ["@typescript-eslint", "import"],
   rules: {

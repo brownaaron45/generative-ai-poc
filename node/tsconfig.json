@@ -10,6 +10,6 @@
     "target": "ESNext"
   },
   "compileOnSave": true,
-  "include": ["src/**/*.ts", ".eslintrc.js", "typings/**/*.d.ts"],
+  "include": ["src/**/*.ts", ".eslintrc.js"],
   "exclude": ["node_modules"]
 }

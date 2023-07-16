@@ -1,3 +1,4 @@
+// src/text_summarizer.ts
 import * as dotenv from "dotenv";
 import {Configuration, OpenAIApi} from "openai";
 
@@ -9,19 +10,27 @@ const _configuration = new Configuration({
 const _openai = new OpenAIApi(_configuration);
 
 export const summarizeText = async (text: string) => {
-  const prompt = `Provide a summary of the text: ${text}`;
-  const response = await _openai.createCompletion({
-    model: "davinci",
-    prompt: prompt,
-    temperature: 0.3,
-    max_tokens: 250,
-    top_p: 1,
-    frequency_penalty: 0,
-    presence_penalty: 0,
+  const chatCompletion = await _openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "system",
+        content:
+          "You jobs is to take the submitted messages of text and generate a " +
+          "summary based on the text. The following text snippets are taken " +
+          "from pdf's after they have been parsed so their may be some " +
+          "irregularities with order.",
+      },
+      {
+        role: "user",
+        content: text,
+      },
+    ],
+    max_tokens: 256,
   });
 
-  console.log(`response: ${response.data}`);
+  const summary = chatCompletion.data.choices[0].message?.content;
+  console.log(`response: ${summary}`);
 
-  const summary = response.data.choices[0].text.trim();
-  return summary;
+  return summary || "Summary Unavailable";
 };

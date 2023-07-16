@@ -1,9 +1,8 @@
 import express from "express";
 import multer from "multer";
-// eslint-disable-next-line spaced-comment
-/// <reference path="../typings/pdf2json-types.d.ts" />
-import {Page, Text} from "pdf2json-types";
 import {extractTextFromPDFBuffer} from "./pdf_converter";
+import {summarizeText} from "./text_summarizer";
+import {Page, Text} from "./third-party-types/pdf2json-types";
 
 const app = express();
 const port = 3000;
@@ -30,16 +29,20 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
     const pdfData = await extractTextFromPDFBuffer(pdfBuffer);
 
     const pages = pdfData.Pages;
+    let combinedText = "";
     pages.forEach((page: Page, pageIndex: number) => {
       page.Texts.forEach((text: Text) => {
         const decodedText = decodeURIComponent(text.R[0].T);
+        combinedText += decodedText;
         if (decodedText.includes("search term")) {
           console.log(`Found text on page ${pageIndex + 1}: ${decodedText}`);
         }
       });
     });
 
-    res.json(pdfData);
+    const summary = await summarizeText(combinedText);
+
+    res.json({"pdfSummary": summary});
   } catch (err: unknown) {
     if (err instanceof Error) {
       res.status(500).json({error: err.message});
