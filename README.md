@@ -1,19 +1,21 @@
 # generative-ai-poc
 
-attempting to use generative ai to summarize a pdf document into one page
+This project demonstrates the ability to summarize uploaded documents, starting with PDFs. The text is extracted using the NodeJS library pdf2json and then summarized by ChatGPT 3.5-turbo, with a limit of approximately 500 characters. The project is open-source and utilizes Dart and NodeJS languages. Links to the libraries used are provided below.
 
-## PDFMiner
+* [Flutter](https://docs.flutter.dev/)
 
-PDF to text conversion
+* [ExpressJS](https://expressjs.com/)
 
-## SummerTime
+* [OpenAI](https://platform.openai.com/overview)
 
-[https://github.com/Yale-LILY/SummerTime](https://github.com/Yale-LILY/SummerTime)
+* [PDF-2-JSON](https://www.npmjs.com/package/pdf2json)
 
-open source text summarization toolkit for non experts
+* [PDF Render](https://pub.dev/packages/pdf_render)
 
-## Tesseract-OCR
+## [View the Demo](./docs/generative-ai-poc-demo.gif)
 
-[https://github.com/tesseract-ocr/tesseract](https://github.com/tesseract-ocr/tesseract)
+![Generative AI POC Demo](./docs/generative-ai-poc-demo.gif)
 
-tesseract-ocr (will be use to detect the text in an pdf document) .pdf, .tff. png
+## Running for Yourself
+
+Navigate to `flutter` directory and run the program using the flutter command. Alternatively use VS Code and execute the main.dart file upon opening in the editor. Next run the ExpressJS server using `npm start` in the `node` directory.

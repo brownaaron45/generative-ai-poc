@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:pdf_render/pdf_render_widgets.dart';
 
 void main() {
@@ -17,16 +21,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Generative AI POC',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorSchemeSeed: Colors.blue,
       ),
       home: const MyHomePage(title: 'Generative AI POC'),
     );
@@ -52,11 +49,6 @@ class _MyHomePageState extends State<MyHomePage> {
       body: const Center(
         child: PdfUploadWidget(),
       ),
-      floatingActionButton: const FloatingActionButton(
-        onPressed: null,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
     );
   }
 }
@@ -70,6 +62,8 @@ class PdfUploadWidget extends StatefulWidget {
 
 class PdfUploadWidgetState extends State<PdfUploadWidget> {
   Uint8List? _fileBytes;
+  String? _summaryText;
+
   double margin = 0;
   double padding = 16;
 
@@ -86,6 +80,34 @@ class PdfUploadWidgetState extends State<PdfUploadWidget> {
     }
   }
 
+  Future<void> _summarizePdf() async {
+    try {
+      var url = Uri.parse('http://localhost:3000/summarize');
+      var request = http.MultipartRequest('POST', url);
+      var multipartFile = http.MultipartFile.fromBytes(
+        'pdf',
+        _fileBytes!,
+        contentType: MediaType('application', 'pdf'),
+        filename: 'example.pdf',
+      );
+      request.files.add(multipartFile);
+
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        final bodyStream = response.stream.transform(utf8.decoder);
+        final bodyString = await bodyStream.join();
+
+        setState(() {
+          _summaryText = bodyString;
+        });
+      } else {
+        print('Failed to upload');
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -98,51 +120,69 @@ class PdfUploadWidgetState extends State<PdfUploadWidget> {
         const SizedBox(height: 16),
         if (_fileBytes != null)
           Expanded(
-            child: Row(children: [
-              SizedBox(
-                width: 600,
-                child: PdfDocumentLoader.openData(
-                  _fileBytes!,
-                  documentBuilder: (context, pdfDocument, pageCount) =>
-                      LayoutBuilder(
-                    builder: (context, constraints) => ListView.builder(
-                      itemCount: pageCount,
-                      itemBuilder: (context, index) => Container(
-                        margin: EdgeInsets.all(margin),
-                        padding: EdgeInsets.all(padding),
-                        color: Colors.black12,
-                        child: PdfPageView(
-                          pdfDocument: pdfDocument,
-                          pageNumber: index + 1,
+            child: Row(
+              children: [
+                SizedBox(
+                  width: max(MediaQuery.of(context).size.width / 2, 500),
+                  child: PdfDocumentLoader.openData(
+                    _fileBytes!,
+                    documentBuilder: (context, pdfDocument, pageCount) =>
+                        LayoutBuilder(
+                      builder: (context, constraints) => ListView.builder(
+                        itemCount: pageCount,
+                        itemBuilder: (context, index) => Container(
+                          margin: EdgeInsets.all(margin),
+                          padding: EdgeInsets.all(padding),
+                          color: Colors.black12,
+                          child: PdfPageView(
+                            pdfDocument: pdfDocument,
+                            pageNumber: index + 1,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              const Spacer(),
-              SizedBox(
-                width: 600,
-                child: PdfDocumentLoader.openData(
-                  _fileBytes!,
-                  documentBuilder: (context, pdfDocument, pageCount) =>
-                      LayoutBuilder(
-                    builder: (context, constraints) => ListView.builder(
-                      itemCount: pageCount,
-                      itemBuilder: (context, index) => Container(
-                        margin: EdgeInsets.all(margin),
-                        padding: EdgeInsets.all(padding),
-                        color: Colors.black12,
-                        child: PdfPageView(
-                          pdfDocument: pdfDocument,
-                          pageNumber: index + 1,
-                        ),
-                      ),
-                    ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (_summaryText == null)
+                        ElevatedButton(
+                          onPressed: _fileBytes == null
+                              ? null
+                              : () async {
+                                  await _summarizePdf();
+                                },
+                          child: const Text("Summarize PDF"),
+                        )
+                      else
+                        Expanded(
+                          child: Column(
+                            children: [
+                              ElevatedButton(
+                                onPressed: _fileBytes == null
+                                    ? null
+                                    : () async {
+                                        await _summarizePdf();
+                                      },
+                                child: const Text("Summarize PDF"),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  _summaryText!,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                    ],
                   ),
                 ),
-              ),
-            ]),
+              ],
+            ),
           )
         else
           const Text('No file selected.'),

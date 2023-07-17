@@ -11,6 +11,10 @@ const upload = multer({storage: multer.memoryStorage()});
 
 // Middleware
 app.use(express.json());
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
 
 // Routes
 app.get("/", (req: express.Request, res: express.Response) => {
@@ -18,7 +22,7 @@ app.get("/", (req: express.Request, res: express.Response) => {
 });
 
 
-app.post("/upload", upload.single("pdf"), async (req, res) => {
+app.post("/summarize", upload.single("pdf"), async (req, res) => {
   try {
     if (!req.file) {
       res.status(400).json({error: "No file was uploaded"});
@@ -40,9 +44,13 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
       });
     });
 
-    const summary = await summarizeText(combinedText);
+    if (combinedText.length === 0) {
+      res.status(500).json({error: "No text found in pdf"});
+      return;
+    }
 
-    res.json({"pdfSummary": summary});
+    const summary = await summarizeText(combinedText);
+    res.status(200).send(summary);
   } catch (err: unknown) {
     if (err instanceof Error) {
       res.status(500).json({error: err.message});
